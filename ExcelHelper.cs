@@ -57,7 +57,7 @@ namespace Aron.Sinoai.OfficeHelper
 
         public void Dispose()
         {
-            document.Dispose();
+            document.Close();
             document = null;
         }
         
@@ -117,6 +117,16 @@ namespace Aron.Sinoai.OfficeHelper
             return range;
         }
 
+        public void SetDefinedNameRange(string name, CellRangeRef value)
+        {
+            DefinedName definedName = (
+                from item in document.WorkbookPart.Workbook.DefinedNames.Elements<DefinedName>()
+                where item.Name == name
+                select item).Single();
+
+            definedName.Text = value.ToString();
+        }
+
         public void DeleteSheet(string name)
         {
             FindSheetByName(name).Remove();
@@ -145,13 +155,27 @@ namespace Aron.Sinoai.OfficeHelper
             {
                 foreach (Cell cell in rowGroup)
                 {
-                    if (cell.DataType != null && cell.CellValue != null &&
-                        cell.DataType.Value == CellValues.SharedString)
+                    if (cell.DataType != null && cell.CellValue != null)
                     {
-                        int index = int.Parse(cell.CellValue.Text);
-                        SharedStringItem stringItem = document.WorkbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(index);
+                        string stringValue = null;
 
-                        string stringValue = stringItem.InnerText;
+                        switch (cell.DataType.Value)
+                        {
+                            case CellValues.SharedString : 
+                            {
+                                int index = int.Parse(cell.CellValue.Text);
+                                SharedStringItem stringItem = document.WorkbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(index);
+
+                                stringValue = stringItem.InnerText;
+                                break;
+                            }
+                            case CellValues.String:
+                            {
+                                stringValue = cell.CellValue.Text;
+                                break;
+                            }
+                        }
+
                         if (PARAM_PATTERN.IsMatch(stringValue))
                         {
                             var match = PARAM_PATTERN.Match(stringValue);
