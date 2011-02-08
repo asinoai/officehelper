@@ -56,6 +56,11 @@ namespace Aron.Sinoai.OfficeHelper
                 }
 
                 result++; //1 based
+
+                if (value.Length > 1)
+                {
+                    result += 26;
+                }
             }
 
             return result;
@@ -68,15 +73,30 @@ namespace Aron.Sinoai.OfficeHelper
             if (value > 0)
             {
                 value--; //1 based
-                do
+
+                if (value < 26)
                 {
-                    result.Add((char)('A' + value % 26));
-                    value = value / 26;
-                } while (value > 0);
+                    result.Add((char)('A' + value));
+                }
+                else
+                {
+                    value -= 26;
+                    do
+                    {
+                        result.Add((char)('A' + value % 26));
+                        value = value / 26;
+                    } while (value > 0);
+
+                    if (result.Count == 1)
+                    {
+                        result.Add('A');
+                    }
+                }
             }
 
             return new string(result.Reverse<char>().ToArray());
         }
+
 
         static public string ToString(int row, int column)
         {
