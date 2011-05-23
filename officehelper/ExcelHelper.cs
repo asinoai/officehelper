@@ -6,6 +6,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using System.IO;
 using System.Text.RegularExpressions;
+using DocumentFormat.OpenXml;
 
 namespace Aron.Sinoai.OfficeHelper
 {
@@ -14,7 +15,7 @@ namespace Aron.Sinoai.OfficeHelper
         
         #region public types
 
-        public enum DirectionType
+        public enum DirectionType : int
         {
             LEFT_TO_RIGHT
             ,TOP_TO_DOWN
@@ -31,6 +32,7 @@ namespace Aron.Sinoai.OfficeHelper
         private SpreadsheetDocument document;
         private string currentSheetName;
         private SheetData currentSheetData;
+        private Worksheet currentWorksheet;
         private CellRef currentPosition;
         private Row currentRow; //actually it is the row before which we should insert the current-row
         private DirectionType direction;
@@ -59,6 +61,27 @@ namespace Aron.Sinoai.OfficeHelper
         {
             document.Close();
             document = null;
+        }
+
+        public void ReplaceParameterInHeaderOrFooter(
+          string parameterName, string parameterValue)
+        {
+            HeaderFooter headerFooter = currentWorksheet.Descendants<HeaderFooter>().FirstOrDefault();
+            if (headerFooter != null)
+            {
+                foreach (var element in new List<OpenXmlLeafTextElement> { headerFooter.EvenFooter, headerFooter.EvenHeader, headerFooter.OddFooter, headerFooter.OddHeader, headerFooter.FirstFooter, headerFooter.FirstHeader })
+                {
+                    if (element != null)
+                    {
+                        element.Text = ReplaceParamterInText(element.Text, parameterName, parameterValue);
+                    }
+                }
+            }
+        }
+
+        private string ReplaceParamterInText(string text, string parameterName, string parameterValue)
+        {
+            return text.Replace(String.Format("<{0}>", parameterName), parameterValue);
         }
         
         public void InsertRange(CellRangeTemplate template)
@@ -199,7 +222,9 @@ namespace Aron.Sinoai.OfficeHelper
             set 
             { 
                 currentSheetName = value;
-                currentSheetData = FindSheetDataByName(currentSheetName);
+                currentWorksheet = FindWorksheetByName(currentSheetName);
+                currentSheetData = currentWorksheet.GetFirstChild<SheetData>();
+
             }
         }
 
@@ -254,21 +279,21 @@ namespace Aron.Sinoai.OfficeHelper
             return sheet;
         }
 
-        private SheetData FindSheetDataByName(string sheetName)
+        private Worksheet FindWorksheetByName(string sheetName)
         {
             Sheet sheet = FindSheetByName(sheetName);
 
-            SheetData sheetData = FindSheetDataBySheet(sheet);
+            Worksheet worksheet = FindWorksheetBySheet(sheet);
 
-            return sheetData;
+            return worksheet;
         }
 
-        private SheetData FindSheetDataBySheet(Sheet sheet)
+        private Worksheet FindWorksheetBySheet(Sheet sheet)
         {
             WorksheetPart workSheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(sheet.Id);
 
-            SheetData sheetData = workSheetPart.Worksheet.GetFirstChild<SheetData>();
-            return sheetData;
+            Worksheet worksheet = workSheetPart.Worksheet;
+            return worksheet;
         }
 
         private void MoveCurrentRow(int rowIndex)
