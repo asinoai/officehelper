@@ -33,6 +33,7 @@ namespace Aron.Sinoai.OfficeHelper
         private string currentSheetName;
         private SheetData currentSheetData;
         private Worksheet currentWorksheet;
+        private Sheet currentSheet;
         private CellRef currentPosition;
         private Row currentRow; //actually it is the row before which we should insert the current-row
         private DirectionType direction;
@@ -79,11 +80,84 @@ namespace Aron.Sinoai.OfficeHelper
             }
         }
 
-        private string ReplaceParamterInText(string text, string parameterName, string parameterValue)
+        public void InsertSheet(string toBeCopiedSheetName, string newSheetName)
         {
-            return text.Replace(String.Format("<{0}>", parameterName), parameterValue);
+            WorkbookPart workbookPart = document.WorkbookPart;
+
+            Sheet sourceSheet = FindSheetByName(toBeCopiedSheetName);
+            WorksheetPart sourceSheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(sourceSheet.Id);
+
+            //Take advantage of AddPart for deep cloning
+            MemoryStream tempStream = new MemoryStream();
+            try
+            {
+                SpreadsheetDocument tempDocument = SpreadsheetDocument.Create(tempStream, document.DocumentType);
+                try
+                {
+                    WorkbookPart tempWorkbookPart = tempDocument.AddWorkbookPart();
+                    WorksheetPart tempWorksheetPart = tempWorkbookPart.AddPart<WorksheetPart>(sourceSheetPart);
+
+                    //Add cloned sheet and all associated parts to workbook 
+                    WorksheetPart clonedSheet = workbookPart.AddPart<WorksheetPart>(tempWorksheetPart);
+
+                    //Table definition parts are somewhat special and need unique ids...so let's make an id based on count 
+                    int numTableDefParts = sourceSheetPart.GetPartsCountOfType<TableDefinitionPart>();
+                    if (numTableDefParts != 0)
+                    {
+                        //Every table needs a unique id and name 
+                        int tableId = numTableDefParts;
+
+                        foreach (TableDefinitionPart tableDefPart in clonedSheet.TableDefinitionParts)
+                        {
+                            tableId++;
+
+                            tableDefPart.Table.Id = (uint)tableId;
+                            tableDefPart.Table.DisplayName = newSheetName + tableDefPart.Table.DisplayName;
+                            tableDefPart.Table.Name = newSheetName + tableDefPart.Table.Name;
+
+                            tableDefPart.Table.Save();
+                        }
+                    }
+
+                    //There can only be one sheet that has focus 
+                    SheetViews views = clonedSheet.Worksheet.GetFirstChild<SheetViews>();
+                    if (views != null)
+                    {
+                        views.Remove();
+                        clonedSheet.Worksheet.Save();
+                    }
+
+                    //Add new sheet to main workbook part 
+                    Sheets sheets = workbookPart.Workbook.GetFirstChild<Sheets>();
+
+                    Sheet copiedSheet = new Sheet();
+                    copiedSheet.Name = newSheetName;
+                    copiedSheet.Id = workbookPart.GetIdOfPart(clonedSheet);
+                    copiedSheet.SheetId = (uint)sheets.ChildElements.Count + 1;
+
+                    sheets.InsertAfter(copiedSheet, currentSheet);
+
+                    //Save the sheet
+                    workbookPart.Workbook.Save();
+
+
+                    //making the copied sheet the current sheet
+                    currentSheetName = newSheetName;
+                    currentSheet = copiedSheet;
+                    currentWorksheet = clonedSheet.Worksheet;
+                    currentSheetData = currentWorksheet.GetFirstChild<SheetData>();
+                }
+                finally
+                {
+                    tempDocument.Dispose();
+                }
+            }
+            finally
+            {
+                tempStream.Dispose();
+            }
         }
-        
+
         public void InsertRange(CellRangeTemplate template)
         {
             InsertRange(template.Range);
@@ -222,9 +296,18 @@ namespace Aron.Sinoai.OfficeHelper
             set 
             { 
                 currentSheetName = value;
-                currentWorksheet = FindWorksheetByName(currentSheetName);
-                currentSheetData = currentWorksheet.GetFirstChild<SheetData>();
-
+                if (currentSheetName != null)
+                {
+                    currentSheet = FindSheetByName(CurrentSheetName);
+                    currentWorksheet = FindWorksheetBySheet(currentSheet);
+                    currentSheetData = currentWorksheet.GetFirstChild<SheetData>();
+                }
+                else
+                {
+                    currentSheet = null;
+                    currentWorksheet = null;
+                    currentSheetData = null;
+                }
             }
         }
 
@@ -375,6 +458,10 @@ namespace Aron.Sinoai.OfficeHelper
             }
         }
 
+        private string ReplaceParamterInText(string text, string parameterName, string parameterValue)
+        {
+            return text.Replace(String.Format("<{0}>", parameterName), parameterValue);
+        }
 
         #endregion
 
