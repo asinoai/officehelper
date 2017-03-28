@@ -20,4 +20,4 @@ http://www.microsoft.com/downloads/en/details.aspx?familyid=941b3470-3ae9-4aee-8
 
 [//]: #
 
-   [Documentation]: <https://github.com/asinoai/officehelper/master/documentation.md>
+   [Documentation]: <https://github.com/asinoai/officehelper/blob/master/documentation.md>
