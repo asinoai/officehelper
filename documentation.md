@@ -1,5 +1,4 @@
-You can check the SqliteExporter folder in the Source Code section, for a more complex example, which uses in action this library, or you can check the below sample.
-The SqliteExporter is even available as executable in the download section.
+You can check the SqliteExporter folder of the sources, in the Code section, for a more complex example, which uses in action this library, or you can check the below sample.
 
 Sample code to use the library
 
