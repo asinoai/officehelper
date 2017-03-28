@@ -12,12 +12,13 @@ This file will be the base of the generated xlsx.
 
 Excel has a feature called insert names.
 
-[image:DefiningNamesExcel2010.png]
+![DefiningNamesExcel2010.png](https://raw.github.com/asinoai/officehelper/master/DefiningNamesExcel2010.png)
 
 You will have to create the two names, which will be used in the example code: "header" and "sample1".
 
 The below image shows just the creation of the "sample1", you will have to do it the same for the "header".
-[image:DefiningNamesCExcel2010.png]
+
+![DefiningNamesExcel2010.png](https://raw.github.com/asinoai/officehelper/master/DefiningNamesCExcel2010.png)
 
 Notice that both "names" are on "Sheet3", sheet which we will be deleted progamatically at the end, since it contains just our "templates" and we don't want to appear in the generated file.
 Also notice that "sample1" contains cells, which start with the sign "<" and end with the sing ">". They are this way specially marked and we can replace their content, with values from our code.
@@ -25,7 +26,7 @@ It is maybe good to note also that the "names", can be anywhere, at any cell pos
 
 One last detail that you need to do before you start: format the cell with the value "<value>" as date, otherwise it will show as a number.
 
-[image:Formatting.png]
+![DefiningNamesExcel2010.png](https://raw.github.com/asinoai/officehelper/master/Formatting.png)
 
 Also make sure that you save your workbook as "xlsx".
 If you are using Office 2003 or 2000, you can still save it as an "xlsx", if you install the following compatibility pack provided by Microsoft:
@@ -98,6 +99,12 @@ More exactly the parameter "name" will be replaced by the first item, the "value
         }
 
 {code:c#}
+
+
+![DefiningNamesExcel2010.png](https://raw.github.com/asinoai/officehelper/master/Formatting.png
+
+
+
 
 For convenience I've uploaded also the excel file: [file:template.xlsx] and a solution with the sample code: [file:WindowsFormsApplication2.zip].
 The template.xlsx I've created (by the way) using google spreadsheets and downloaded as xlsx. :)
