@@ -41,7 +41,6 @@ More exactly it will copy in "Sheet1" at position "C3" the named range "header",
 As you can see in the code, you can customize, which parameter marked in the template between "<" and ">" signs will be replaced by what value. 
 More exactly the parameter "name" will be replaced by the first item, the "value" with the second one, the "comment" with the third one, from the yield list returned by the method "getSample".  
 
-{code:c#}
 
 
         private static String GENERATED_FILE_NAME = @"c:\work\generated.xlsx";
@@ -98,15 +97,19 @@ More exactly the parameter "name" will be replaced by the first item, the "value
             System.Diagnostics.Process.Start(GENERATED_FILE_NAME);
         }
 
-{code:c#}
 
 
-![DefiningNamesExcel2010.png](https://raw.github.com/asinoai/officehelper/master/Formatting.png
+![DefiningNamesExcel2010.png](https://raw.github.com/asinoai/officehelper/master/Formatting.png)
 
 
 
 
-For convenience I've uploaded also the excel file: [file:template.xlsx] and a solution with the sample code: [file:WindowsFormsApplication2.zip].
+For convenience I've uploaded also the excel file: [template.xlsx] and a solution with the sample code: [WindowsFormsApplication2.zip].
 The template.xlsx I've created (by the way) using google spreadsheets and downloaded as xlsx. :)
 
 Note also that  the method called InsertSheet in class ExcelHelper allows you to clone a "template sheet" and insert it right after the current-sheet (settable by CurrentSheetName); in case you set the CurrentSheetName to null, then it will be inserted in front. After inserting the new sheet, this will become the current sheet. Sample code will follow.
+
+[//]: #
+
+   [template.xlsx]: <https://raw.github.com/asinoai/officehelper/master/template.xlsx>
+   [WindowsFormsApplication2.zip]: <https://raw.github.com/asinoai/officehelper/master/WindowsFormsApplication2.zip>
