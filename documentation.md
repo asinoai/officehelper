@@ -1,4 +1,4 @@
-You can check the SqliteExporter folder of the sources, in the Code section, for a more complex example, which uses in action this library, or you can check the below sample.
+You can check the "sqliteexporter" folder of the sources, in the Code section, for a more complex example, which uses in action this library, or you can check the below sample.
 
 Sample code to use the library
 
