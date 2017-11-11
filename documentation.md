@@ -72,7 +72,7 @@ More exactly the parameter "name" will be replaced by the first item, the "value
 
                 helper.CurrentPosition = new CellRef("C3");
 
-                //the template xlsx should contains the named range "header"; use the command "insert"/"name".
+                //the template xlsx should contain the named range "header"; use the command "insert"/"name".
                 helper.InsertRange("header");
 
                 //the template xlsx should contains the named range "sample1";
