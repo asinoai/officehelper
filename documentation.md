@@ -75,7 +75,7 @@ More exactly the parameter "name" will be replaced by the first item, the "value
                 //the template xlsx should contain the named range "header"; use the command "insert"/"name".
                 helper.InsertRange("header");
 
-                //the template xlsx should contains the named range "sample1";
+                //the template xlsx should contain the named range "sample1";
                 //inside this range you should have cells with these values:
                 //<name> , <value> and <comment>, which will be replaced by the values from the getSample()
                 CellRangeTemplate sample1 = helper.CreateCellRangeTemplate("sample1", new List<string> {"name", "value", "comment"}); 
